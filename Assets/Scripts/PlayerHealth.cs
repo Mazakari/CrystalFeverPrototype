@@ -1,10 +1,13 @@
 // Roman Baranov 21.05.2022
 
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
     #region VARIABLES
+    public static PlayerHealth Instance;
+
     /// <summary>
     /// Max character health
     /// </summary>
@@ -24,12 +27,30 @@ public class PlayerHealth : MonoBehaviour
     private bool _isDamagable = true;
     [SerializeField] private float _damageImmuneDuration = 3f;
     private float _curImmuneTimer = 0f;
+
+    /// <summary>
+    /// Distance to closest enemy
+    /// </summary>
+    public float ClosestEnemyDistance { get; private set; } = 0f;
+
+    /// <summary>
+    /// Distance to closest crystal
+    /// </summary>
+    public float ClosestCrystalDistance { get; private set; } = 0f;
     #endregion
 
     #region UNITY Methods
     private void Start()
     {
+        if (Instance)
+        {
+            Instance = null;
+        }
+
+        Instance = this;
+
         CurHealth = _maxHealth;
+        UiEvents.OnPlayerHpChange.Invoke(CurHealth);
 
         // Health state change callbacks
         GameplayEvents.OnPlayerGetHeal.AddListener(GetHealing);
@@ -37,6 +58,12 @@ public class PlayerHealth : MonoBehaviour
 
     private void Update()
     {
+        ClosestEnemyDistance = ClosestDistance(EnemyPool.Instance.EnemiesPool);
+        UiEvents.OnClosestEnemyDistanceChange.Invoke(ClosestEnemyDistance);
+
+        ClosestCrystalDistance = ClosestDistance(CrystalPool.Instance.CrystalsPool);
+        UiEvents.OnClosestCrystalDistanceChange.Invoke(ClosestCrystalDistance);
+
         DamageImmuneTimer(_damageImmuneDuration);
     }
     #endregion
@@ -51,6 +78,8 @@ public class PlayerHealth : MonoBehaviour
         if (_isDamagable)
         {
             CurHealth -= damage;
+            UiEvents.OnPlayerHpChange.Invoke(CurHealth);
+
             _isDamagable = false;
             if (CurHealth <= 0)
             {
@@ -72,6 +101,8 @@ public class PlayerHealth : MonoBehaviour
     private void GetHealing(int value)
     {
         CurHealth += value;
+        UiEvents.OnPlayerHpChange.Invoke(CurHealth);
+
         if (CurHealth > _maxHealth)
         {
             CurHealth = _maxHealth;
@@ -93,6 +124,33 @@ public class PlayerHealth : MonoBehaviour
                 _isDamagable = true;
             }
         }
+    }
+
+    /// <summary>
+    /// Find closest object distance
+    /// </summary>
+    /// <param name="collection">Objects collection to find closest distance</param>
+    /// <returns>Distance to closest object</returns>
+    private float ClosestDistance<T>(List<T> collection) where T : MonoBehaviour
+    {
+        float minDist = 200f;
+        float dist = 0f;
+
+        for (int i = 0; i < collection.Count; i++)
+        {
+            if (!collection[i].gameObject.activeSelf)
+            {
+                continue;
+            }
+
+            dist = Vector3.Distance(gameObject.transform.position, collection[i].transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+            }
+        }
+
+        return minDist;
     }
     #endregion
 

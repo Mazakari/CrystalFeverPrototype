@@ -62,10 +62,16 @@ public class LevelManager : MonoBehaviour
         }
 
         Instance = this;
+
+        CurEnemies = 0;
+        UiEvents.OnEnemiesCountChange.Invoke(CurEnemies);
     }
 
     private void Start()
     {
+        CurrentPlayerScores = 0;
+        UiEvents.OnPlayerScoreChange.Invoke(CurrentPlayerScores);
+
         GameplayEvents.OnCrystalPickup.AddListener(CrystalPickup);
         GameplayEvents.OnCrystalDestroyed.AddListener(CrystalDestroyed);
         GameplayEvents.OnEnemyDead.AddListener(EnemyLimitUpdate);
@@ -79,6 +85,7 @@ public class LevelManager : MonoBehaviour
     private void CrystalDestroyed(Crystal crystal)
     {
         CurCrystals--;
+        UiEvents.OnCrystalsCountChange.Invoke(CurCrystals);
     }
 
     /// <summary>
@@ -88,6 +95,7 @@ public class LevelManager : MonoBehaviour
     {
         // Add scores
         CurrentPlayerScores++;
+        UiEvents.OnPlayerScoreChange.Invoke(CurrentPlayerScores);
 
         //Check best player scores
         if (CurrentPlayerScores >= BestPlayerScores)
@@ -96,6 +104,7 @@ public class LevelManager : MonoBehaviour
         }
 
         CurCrystals--;
+        UiEvents.OnCrystalsCountChange.Invoke(CurCrystals);
     }
 
     /// <summary>
@@ -104,6 +113,7 @@ public class LevelManager : MonoBehaviour
     private void EnemyLimitUpdate(AI_Agent enemy)
     {
         CurEnemies--;
+        UiEvents.OnEnemiesCountChange.Invoke(CurEnemies);
     }
     #endregion
 

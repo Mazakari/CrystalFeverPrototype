@@ -36,8 +36,6 @@ public class CrystalSpawner : MonoBehaviour
         {
             SpawnCrystal();
 
-            LevelManager.Instance.CurCrystals++;
-
             _curDelay = 0f;
             _rndSpawnDelay = Random.Range(0, _maxSpawnDelay);
         }
@@ -59,6 +57,9 @@ public class CrystalSpawner : MonoBehaviour
 
             crystal.transform.position = spawnPos;
             crystal.gameObject.SetActive(true);
+            LevelManager.Instance.CurCrystals++;
+
+            UiEvents.OnCrystalsCountChange.Invoke(LevelManager.Instance.CurCrystals);
         }
     }
 
@@ -86,8 +87,6 @@ public class CrystalSpawner : MonoBehaviour
         for (int i = 0; i < crystalsAmount; i++)
         {
             SpawnCrystal();
-
-            LevelManager.Instance.CurCrystals++;
         }
     }
     #endregion

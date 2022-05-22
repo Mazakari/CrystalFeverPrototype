@@ -25,8 +25,7 @@ public class EnemySpawner : MonoBehaviour
         if (_curDelay >= _spawnDelay)
         {
             SpawnEnemy();
-
-            LevelManager.Instance.CurEnemies++;
+            
             _curDelay = 0f;
         }
     }
@@ -43,6 +42,9 @@ public class EnemySpawner : MonoBehaviour
         {
             enemy.transform.position = gameObject.transform.position;
             enemy.gameObject.SetActive(true);
+            LevelManager.Instance.CurEnemies++;
+
+            UiEvents.OnEnemiesCountChange.Invoke(LevelManager.Instance.CurEnemies);
         }
     }
     #endregion
