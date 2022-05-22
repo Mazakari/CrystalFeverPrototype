@@ -14,11 +14,27 @@ public class Crystal : MonoBehaviour
     public int HealAmount { get { return _healAmount; } }
     #endregion
 
-    #region PUBLIC Methods
-    public void Pickup()
+    #region COLLISION Handler
+    private void OnTriggerEnter(Collider other)
     {
-        // Send callback to add player scores
-        GameplayEvents.OnCrystalPickup.Invoke(this);
+        AI_Agent enemy = other.gameObject.GetComponent<AI_Agent>();
+        if (enemy)
+        {
+            GameplayEvents.OnEnemyDead.Invoke(enemy);
+            GameplayEvents.OnCrystalDestroyed.Invoke(this);
+            return;
+        }
+
+        PlayerHealth player = other.GetComponent<PlayerHealth>();
+        if (player)
+        {
+            if (player.CurHealth < player.MaxHealth)
+            {
+                GameplayEvents.OnPlayerGetHeal.Invoke(_healAmount);
+            }
+
+            GameplayEvents.OnCrystalPickup.Invoke(this);
+        }
     }
     #endregion
 }

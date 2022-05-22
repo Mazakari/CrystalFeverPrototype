@@ -31,6 +31,8 @@ public class EnemyPool : MonoBehaviour
         Instance = this;
 
         CreateEnemiesPool();
+
+        GameplayEvents.OnEnemyDead.AddListener(ResetEnemy);
     }
     #endregion
 
@@ -51,26 +53,24 @@ public class EnemyPool : MonoBehaviour
 
         return null;
     }
+    #endregion
 
-
+    #region PRIVATE Methods
     /// <summary>
     /// Reset enemy position and return it in the pool
     /// </summary>
     /// <param name="enemy">Enemy to reset</param>
-    public void ResetBullet(AI_Agent enemy)
+    private void ResetEnemy(AI_Agent enemy)
     {
         // Deactivate enemy object
         enemy.gameObject.SetActive(false);
-
         //enemy.RB.velocity = Vector3.zero;
 
         // Reset enemy position
         enemy.transform.position = transform.position;
         enemy.transform.SetParent(transform);
     }
-    #endregion
 
-    #region PRIVATE Methods
     /// <summary>
     /// Spawn enemies pool
     /// </summary>

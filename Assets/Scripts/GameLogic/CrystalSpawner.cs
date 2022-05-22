@@ -20,6 +20,7 @@ public class CrystalSpawner : MonoBehaviour
     private void Start()
     {
         _rndSpawnDelay = Random.Range(0, _maxSpawnDelay);
+        InitCrystals(LevelManager.Instance.MaxCrystalsLimit);
     }
     // Update is called once per frame
     void Update()
@@ -54,6 +55,7 @@ public class CrystalSpawner : MonoBehaviour
         {
             //Get random spawn point on the nav mesh
             Vector3 spawnPos = GetRandomPoint();
+            spawnPos.y = 1f;
 
             crystal.transform.position = spawnPos;
             crystal.gameObject.SetActive(true);
@@ -74,6 +76,19 @@ public class CrystalSpawner : MonoBehaviour
         point = navMeshHit.position;
         
         return point;
+    }
+
+    /// <summary>
+    /// Initial crystals placement on level start
+    /// </summary>
+    private void InitCrystals(int crystalsAmount)
+    {
+        for (int i = 0; i < crystalsAmount; i++)
+        {
+            SpawnCrystal();
+
+            LevelManager.Instance.CurCrystals++;
+        }
     }
     #endregion
 }

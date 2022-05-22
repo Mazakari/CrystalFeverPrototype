@@ -10,7 +10,16 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     [Min(1)]
     [SerializeField] private int _maxHealth = 1;
-    private int _curHealth = 3;
+
+    /// <summary>
+    /// Maximum player health amount
+    /// </summary>
+    public int MaxHealth { get { return _maxHealth; } }
+
+    /// <summary>
+    /// Current player health amount
+    /// </summary>
+    public int CurHealth { get; private set; } = 3;
 
     private bool _isDamagable = true;
     [SerializeField] private float _damageImmuneDuration = 3f;
@@ -20,10 +29,10 @@ public class PlayerHealth : MonoBehaviour
     #region UNITY Methods
     private void Start()
     {
-        _curHealth = _maxHealth;
+        CurHealth = _maxHealth;
 
         // Health state change callbacks
-        GameplayEvents.OnPlayerGetDamage.AddListener(GetDamage);
+        GameplayEvents.OnPlayerGetHeal.AddListener(GetHealing);
     }
 
     private void Update()
@@ -36,44 +45,43 @@ public class PlayerHealth : MonoBehaviour
     /// <summary>
     /// Decrease health by given amount
     /// </summary>
-    /// <param name="value">Damage amount</param>
-    private void GetDamage(int value)
+    /// <param name="damage">Damage amount</param>
+    private void GetDamage(int damage)
     {
         if (_isDamagable)
         {
-            _curHealth -= value;
+            CurHealth -= damage;
             _isDamagable = false;
-            if (_curHealth <= 0)
+            if (CurHealth <= 0)
             {
-                _curHealth = 0;
+                CurHealth = 0;
                
                 // Send player death callback
                 GameplayEvents.OnPlayerDead.Invoke();
-
-                Destroy(gameObject);
+                gameObject.SetActive(false);
             }
         }
     }
+    #endregion
 
+    #region PRIVATE Methods
     /// <summary>
     /// Increase heath by given amount
     /// </summary>
     /// <param name="value">Healing amount</param>
     private void GetHealing(int value)
     {
-        _curHealth += value;
-        if (_curHealth> _maxHealth)
+        CurHealth += value;
+        if (CurHealth > _maxHealth)
         {
-            _curHealth = _maxHealth;
+            CurHealth = _maxHealth;
         }
     }
-    #endregion
 
-    #region PRIVATE Methods
- /// <summary>
- /// Starts player damage immune timer
- /// </summary>
- /// <param name="damageImmuneDuration">damage immune dureation in seconds</param>
+    /// <summary>
+    /// Starts player damage immune timer
+    /// </summary>
+    /// <param name="damageImmuneDuration">damage immune dureation in seconds</param>
     private void DamageImmuneTimer(float damageImmuneDuration)
     {
         if (!_isDamagable)
@@ -86,26 +94,15 @@ public class PlayerHealth : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region COLLISION Handler
     private void OnTriggerEnter(Collider other)
     {
         AI_Agent enemy = other.gameObject.GetComponent<AI_Agent>();
         if (enemy)
         {
             GetDamage(enemy.Damage);
-            return;
-        }
-
-        Crystal crystal = other.GetComponent<Crystal>();
-        if (crystal)
-        {
-            if (_curHealth >= _maxHealth)
-            {
-                return;
-            }
-
-            GetHealing(crystal.HealAmount);
-            crystal.Pickup();
         }
     }
     #endregion

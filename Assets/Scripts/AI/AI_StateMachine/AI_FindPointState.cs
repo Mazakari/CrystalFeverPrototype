@@ -49,8 +49,9 @@ public class AI_FindPointState : AI_State
 
             point = navMeshHit.position;
             NavMeshPath path = new NavMeshPath();
-            agent.NavMeshAgent.CalculatePath(point, path);
-            if (path.status == NavMeshPathStatus.PathComplete)
+            //agent.NavMeshAgent.CalculatePath(point, path);
+            //if (path.status == NavMeshPathStatus.PathComplete)
+            if (agent.NavMeshAgent.CalculatePath(point, path))
             {
                 isPointReachable = true;
             }

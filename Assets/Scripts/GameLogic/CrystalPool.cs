@@ -33,6 +33,7 @@ public class CrystalPool : MonoBehaviour
         CreateCrystalsPool();
 
         GameplayEvents.OnCrystalPickup.AddListener(ResetCrystal);
+        GameplayEvents.OnCrystalDestroyed.AddListener(ResetCrystal);
     }
     #endregion
 
@@ -54,24 +55,23 @@ public class CrystalPool : MonoBehaviour
         return null;
     }
 
+    #endregion
+
+    #region PRIVATE Methods
     /// <summary>
     /// Reset crystal position and return it in the pool
     /// </summary>
     /// <param name="crystal">Crystal to reset</param>
-    public void ResetCrystal(Crystal crystal)
+    private void ResetCrystal(Crystal crystal)
     {
         // Deactivate crystal object
         crystal.gameObject.SetActive(false);
-
-        //enemy.RB.velocity = Vector3.zero;
 
         // Reset crystal position
         crystal.transform.position = transform.position;
         crystal.transform.SetParent(transform);
     }
-    #endregion
 
-    #region PRIVATE Methods
     /// <summary>
     /// Spawn crystal pool
     /// </summary>

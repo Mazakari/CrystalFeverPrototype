@@ -40,6 +40,16 @@ public class LevelManager : MonoBehaviour
     /// Pickup crystal scores
     /// </summary>
     public int CrystalPickupScores { get { return _crystalPickupScores; } }
+
+    /// <summary>
+    /// Scores collected during active game session
+    /// </summary>
+    public int CurrentPlayerScores { get; private set; } = 0;
+
+    /// <summary>
+    /// Best player scores among all gameplay sessions
+    /// </summary>
+    public int BestPlayerScores { get; private set; } = 0;
     #endregion
 
     #region UNITY Methods
@@ -56,7 +66,8 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        GameplayEvents.OnCrystalPickup.AddListener(CrystalsLimitUpdate);
+        GameplayEvents.OnCrystalPickup.AddListener(CrystalPickup);
+        GameplayEvents.OnCrystalDestroyed.AddListener(CrystalDestroyed);
         GameplayEvents.OnEnemyDead.AddListener(EnemyLimitUpdate);
     }
     #endregion
@@ -65,15 +76,32 @@ public class LevelManager : MonoBehaviour
     /// <summary>
     /// Decrease spawned crystals limit
     /// </summary>
-    private void CrystalsLimitUpdate(Crystal crystal)
+    private void CrystalDestroyed(Crystal crystal)
     {
+        CurCrystals--;
+    }
+
+    /// <summary>
+    /// Decrease spawned crystals limit
+    /// </summary>
+    private void CrystalPickup(Crystal crystal)
+    {
+        // Add scores
+        CurrentPlayerScores++;
+
+        //Check best player scores
+        if (CurrentPlayerScores >= BestPlayerScores)
+        {
+            BestPlayerScores = CurrentPlayerScores;
+        }
+
         CurCrystals--;
     }
 
     /// <summary>
     /// Decrease spawned enemies limit
     /// </summary>
-    private void EnemyLimitUpdate()
+    private void EnemyLimitUpdate(AI_Agent enemy)
     {
         CurEnemies--;
     }
