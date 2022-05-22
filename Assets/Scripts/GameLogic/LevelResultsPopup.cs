@@ -43,6 +43,10 @@ public class LevelResultsPopup : MonoBehaviour
         _bestScoresCounter.text = LevelManager.Instance.BestPlayerScores.ToString();
 
         _levelResultsPopup.SetActive(true);
+
+        // Save Best scores
+        SaveGameManager.CurrentSaveData.bestScores = LevelManager.Instance.BestPlayerScores;
+        SaveGameManager.SaveGame();
     }
 
     /// <summary>

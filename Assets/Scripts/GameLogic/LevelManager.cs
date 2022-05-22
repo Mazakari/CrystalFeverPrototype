@@ -49,7 +49,7 @@ public class LevelManager : MonoBehaviour
     /// <summary>
     /// Best player scores among all gameplay sessions
     /// </summary>
-    public int BestPlayerScores { get; private set; } = 0;
+    public int BestPlayerScores { get; private set; }
     #endregion
 
     #region UNITY Methods
@@ -65,6 +65,10 @@ public class LevelManager : MonoBehaviour
 
         CurEnemies = 0;
         UiEvents.OnEnemiesCountChange.Invoke(CurEnemies);
+
+        // Load game
+        SaveGameManager.LoadGame();
+        BestPlayerScores = SaveGameManager.CurrentSaveData.bestScores;
     }
 
     private void Start()
